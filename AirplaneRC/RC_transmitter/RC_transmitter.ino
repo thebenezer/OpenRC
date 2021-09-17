@@ -94,13 +94,13 @@ void loop() {
   // Convert the analog read value from 0 to 1023 into a BYTE value from 0 to 180
   Serial.println(analogRead(A7));
   Serial.println(analogRead(A6));
-  data.pot1   = map(analogRead(A7), 0, 1023, 0, 180) ;//Throws
-  data.pot2   = map(analogRead(A6), 0, 1023, 0, 180) ;
+  data.pot1   = map(analogRead(A7), 0, 1023, 0, 180) ;//Rudder throws
+  data.pot2   = map(analogRead(A6), 0, 1023, 0, 180) ;//Elevator throws
 
   data.joy1X = 90;                                   //Aeleron
-  data.joy1Y = map(analogRead(j1Y), 0, 1023, 0, 180);//Thrust
+  data.joy1Y = 0;
   data.joy2X = map(analogRead(j2X), 0, 1023, 90-data.pot1, 90+data.pot1);//Rudder
-  data.joy2Y = map(analogRead(j2Y), 0, 1023, 90-data.pot1, 90+data.pot1);//Elevator
+  data.joy2Y = map(analogRead(j2Y), 0, 1023, 90-data.pot2, 90+data.pot2);//Elevator
   
   // Read all digital inputs
   data.tSwitch1 = digitalRead(t1);
@@ -114,8 +114,12 @@ void loop() {
 
   
   
-  // If toggle switch 2 is switched on
+  // If toggle switch 2 is switched on use thrust
   if (digitalRead(t2) == 0) {
+    data.joy1Y = map(analogRead(j1Y), 0, 1023, 0, 180);//Thrust
+  }
+  // If toggle switch 3 is switched on use aelrons
+  if (digitalRead(t3) == 0) {
     data.joy1X = map(analogRead(j1X), 1023, 0, 0, 180); // Use on Aelron Control
   }
     // If toggle switch 1 is switched on
