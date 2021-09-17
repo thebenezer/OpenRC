@@ -8,7 +8,7 @@
 #include <nRF24L01.h>
 #include <RF24.h>
 
-RF24 radio(7, 8); // CE-9, CSN-10
+RF24 radio(7, 8); // CE-9/7, CSN-10/8 
 bool result;
 const byte address[6] = "00AA1";
 
