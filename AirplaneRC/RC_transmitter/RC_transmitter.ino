@@ -37,7 +37,7 @@ Adafruit_SSD1306 display(128, 64, &Wire, OLED_RESET);
 // Max size of this struct can be 32 bytes - NRF24L01 buffer limit
 struct Data_Package {
   byte joy1X=90;
-  byte joy1Y=90;
+  byte joy1Y=0;
   byte joy2X=90;
   byte joy2Y=90;
   byte pot1=0;
