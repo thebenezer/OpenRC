@@ -94,11 +94,11 @@ void loop() {
   data.rudd = rudd_trim+map(analogRead(j2X), 0, 1023, 90-rudd_throws, 90+rudd_throws);//Rudder
   data.elev = ele_trim+map(analogRead(j2Y), 0, 1023, 90-ele_throws, 90+ele_throws);//Elevator
 
-  // Switches to limit thrust
+  // Switches to limit thrust if your motor is too powerful
   if (digitalRead(t3) == 0) { // If toggle switch 3 is switched on use 100% thrust
     data.thrust = map(analogRead(j1Y), 0, 1023, 0, 180);
   }
-  else if (digitalRead(t2) == 0) { // If toggle switch 2 is switched on use thrust, a safety measure to prevent accidental thrust input :P
+  else if (digitalRead(t2) == 0) { // If toggle switch 2 is switched on use 50% thrust, a safety measure to prevent accidental thrust input :P
     data.thrust = map(analogRead(j1Y), 0, 1023, 0, 90);
   }
   
