@@ -29,7 +29,7 @@
 RF24 radio(9, 10); // CE, CSN
 const byte address[6] = "000A1";
 bool rc;
-byte ele_throws,rudd_throws;
+int ele_throws,rudd_throws,ele_trim=0,rudd_trim=0;
 
 //SCREEN WIDTH = 128  OLED display width, in pixels
 //SCREEN HEIGHT= 64 OLED display height, in pixels
@@ -86,28 +86,43 @@ void loop() {
   // Convert the analog read value from 0 to 1023 into a BYTE value from 0 to 180
 //  Serial.println(analogRead(A7));
 //  Serial.println(analogRead(A6));
-  ele_throws   = map(analogRead(p1), 0, 1023, 0, 180);//Elevator throws
-  rudd_throws   = map(analogRead(p2), 0, 1023, 0, 180) ;//Rudder throws
+  ele_throws   = map(analogRead(p1), 0, 1023, -90, 90);//Elevator throws
+  rudd_throws   = map(analogRead(p2), 0, 1023, -90, 90) ;//Rudder throws
 
   data.thrust = 0;//Thrust  
-  data.ail = 90; // Aileron
-  data.rudd = map(analogRead(j2X), 0, 1023, 90-ele_throws, 90+ele_throws);//Rudder
-  data.elev = map(analogRead(j2Y), 0, 1023, 90-rudd_throws, 90+rudd_throws);//Elevator
+  data.ail = data.ail = map(analogRead(j1X), 1023, 0, 90-20, 90+20); // Aileron
+  data.rudd = rudd_trim+map(analogRead(j2X), 0, 1023, 90-rudd_throws, 90+rudd_throws);//Rudder
+  data.elev = ele_trim+map(analogRead(j2Y), 0, 1023, 90-ele_throws, 90+ele_throws);//Elevator
 
-
-  
-  if (digitalRead(t2) == 0) { // If toggle switch 2 is switched on use thrust, a safety measure to prevent accidental thrust input :P
+  // Switches to limit thrust
+  if (digitalRead(t3) == 0) { // If toggle switch 3 is switched on use 100% thrust
     data.thrust = map(analogRead(j1Y), 0, 1023, 0, 180);
   }
-  
-  if (digitalRead(t3) == 0) { // If toggle switch 3 is switched on use ailerons
-    data.ail = map(analogRead(j1X), 1023, 0, 90-rudd_throws, 90+rudd_throws); // Aileron
+  else if (digitalRead(t2) == 0) { // If toggle switch 2 is switched on use thrust, a safety measure to prevent accidental thrust input :P
+    data.thrust = map(analogRead(j1Y), 0, 1023, 0, 90);
   }
-    // If toggle switch 1 is switched on
+  
+  // If toggle switch 1 is switched on Turn on display for testing
   if (digitalRead(t1) == 0) {
-    OLEDtest();    // Turn on display for testing
+    OLEDtest();   
+    
+    // Using Push buttons for trim
+    if(digitalRead(bu) == 0){
+      ele_trim+=1;
+    }
+    else if(digitalRead(bd) == 0){
+      ele_trim-=1;
+    }
+    else if(digitalRead(br) == 0){
+      rudd_trim+=1;
+    }
+    else if(digitalRead(bl) == 0){
+      rudd_trim-=1;
+    }
   }
+
   
+   
   // Send the whole data from the structure to the receiver
   radio.write(&data, sizeof(Data_Package));
 }
